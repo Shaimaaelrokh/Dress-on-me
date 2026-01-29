@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom"; 
 import CartProvider from "./context/CartContext";
 
-// الصفحات
+// استدعاء الصفحات
 import Login from "./pages/Login";
 import ChooseRole from "./pages/ChooseRole";
 import Profile from "./pages/Profile";

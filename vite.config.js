@@ -1,8 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/Dress-on-me/',
+  base: '/Dress-on-me/', // تأكدي أن السلاش في البداية والنهاية موجودة
 })
