@@ -1,21 +1,36 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
-const CartContext = createContext();
-
+export const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export default function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
-  // --- إضافة الحالة الخاصة بالويش ليست ---
-  const [wishlist, setWishlist] = useState([]);
 
-  // دالة إضافة للسلة (كودك الأصلي بدون تغيير)
+  const [cartItems, setCartItems] = useState(() => {
+    const saved = localStorage.getItem("app_cart");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [wishlist, setWishlist] = useState(() => {
+    const saved = localStorage.getItem("app_wishlist");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("app_cart", JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  useEffect(() => {
+    localStorage.setItem("app_wishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
+
   const addToCart = (product) => {
     setCartItems(prev => {
       const exist = prev.find(item => item.id === product.id);
       if (exist) {
         return prev.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       }
       return [...prev, { ...product, quantity: 1 }];
@@ -29,38 +44,36 @@ export default function CartProvider({ children }) {
   const updateQuantity = (id, amount) => {
     setCartItems(prev =>
       prev.map(item =>
-        item.id === id 
-          ? { ...item, quantity: Math.max(1, item.quantity + amount) } 
+        item.id === id
+          ? { ...item, quantity: Math.max(1, (item.quantity || 1) + amount) }
           : item
       )
     );
   };
 
-  // --- دالات الويش ليست الجديدة ---
   const addToWishlist = (product) => {
-    setWishlist((prev) => {
-      const exists = prev.find((item) => item.id === product.id);
-      if (!exists) {
-        return [...prev, product];
-      }
-      return prev; // إذا كان موجوداً لا يكرره
+    setWishlist(prev => {
+      if (prev.find(item => item.id === product.id)) return prev;
+      return [...prev, product];
     });
   };
 
   const removeFromWishlist = (id) => {
-    setWishlist((prev) => prev.filter((item) => item.id !== id));
+    setWishlist(prev => prev.filter(item => item.id !== id));
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cart: cartItems, // مررناه باسم cart ليطابق كود الـ Shop عندك
-      addToCart, 
-      removeFromCart, 
-      updateQuantity,
-      wishlist,        // مررنا قائمة الويش ليست
-      addToWishlist,   // دالة الإضافة للويش ليست
-      removeFromWishlist // دالة الحذف من الويش ليست
-    }}>
+    <CartContext.Provider
+      value={{
+        cart: cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        wishlist,
+        addToWishlist,
+        removeFromWishlist
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

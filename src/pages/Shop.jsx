@@ -1,64 +1,71 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle, FaShoppingCart, FaStar, FaCartPlus, FaHeart, } from "react-icons/fa";
+import { FaUserCircle, FaShoppingCart, FaStar, FaCartPlus, FaHeart } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
+import { getPosts } from "../api/api";
 import "../styles/Shop.css";
+
+// استيراد كافة الصور المستخدمة في المشروع (للخلفية والصور الجانبية فقط)
 import mainBg from "../assets/lery.jpg"; 
 import sideImg1 from "../assets/azza.jpg"; 
 import sideImg2 from "../assets/zz.jpg"; 
 import sideImg3 from "../assets/aa.jpg"; 
-import sideImg4 from "../assets/oo.jpg"; 
-import sideImg5 from "../assets/Egyptian woman.jpg"; 
-import sideImg6 from "../assets/stat.jpg"; 
-import sideImg7 from "../assets/qq.jpg"; 
-import sideImg8 from "../assets/azzo.jpg"; 
-import sideImg9 from "../assets/download (26).jpg"; 
-import sideImg10 from "../assets/download.jpg"; 
-import sideImg11 from "../assets/55.jpg"; 
-import sideImg12 from "../assets/ff.jpg"; 
-import sideImg13 from "../assets/gg.jpg"; 
-import sideImg14 from "../assets/qq3.jpg"; 
-import sideImg15 from "../assets/aa.jpg"; 
 
 const Shop = () => {
   const navigate = useNavigate();
   const { cart, addToCart, addToWishlist, wishlist } = useCart(); 
   const [activeTab, setActiveTab] = useState("shop");
   
-  // حالة التحكم في ظهور الرسالة والنص بداخلها
+  // حالة التحكم في ظهور رسالة التأكيد (Toast)
   const [toast, setToast] = useState({ show: false, message: "" });
+  
+  // حالة جديدة لتخزين المنتجات من البروفايل
+  const [products, setProducts] = useState([]);
 
-  const products = [
-    { id: 1, brand: "Azza Fahmy", name: "Necklace", price: 300, rating: 5, image: sideImg1 },
-    { id: 2, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 4, image: sideImg2 },
-    { id: 3, brand: "Azza Fahmy", name: "Tales of the nile - Azza Fahmy", price: 78, rating: 5, image: sideImg3 },
-    { id: 4, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 5, image: mainBg },
-    { id: 5, brand: "Azza Fahmy", name: "Necklace", price: 300, rating: 5, image: sideImg5 },
-    { id: 6, brand: "Azza Fahmy", name: "Earrings", price: 78, rating: 4, image: sideImg6 },
-    { id: 7, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 5, image: sideImg7 },
-    { id: 8, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 5, image: sideImg8 },
-    { id: 9, brand: "Azza Fahmy", name: "Necklace", price: 300, rating: 5, image: sideImg9 },
-    { id: 10, brand: "Azza Fahmy", name: "Rings", price: 78, rating: 4, image: sideImg10 },
-    { id: 11, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 5, image: sideImg4 },
-    { id: 12, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 5, image: sideImg11 },
-    { id: 13, brand: "Azza Fahmy", name: "Bracelets", price: 300, rating: 5, image: sideImg13 },
-    { id: 14, brand: "Azza Fahmy", name: "Rings", price: 78, rating: 4, image: sideImg14 },
-    { id: 15, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 5, image: sideImg15 },
-    { id: 16, brand: "Azza Fahmy", name: "Necklace", price: 78, rating: 5, image: sideImg12 },
-  ];
+  // جلب المنتجات من البوستات عند تحميل الصفحة
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const posts = await getPosts();
+      // تحويل البوستات لصيغة المنتجات
+      const formattedProducts = posts.map(post => ({
+        id: post.id,
+        brand: post.user || "Seller",
+        name: post.text || "Product",
+        price: post.price || 0,
+        rating: post.rating || 0,
+        image: post.files && post.files.length > 0 ? post.files[0] : "https://via.placeholder.com/300",
+        files: post.files || [],
+        text: post.text
+      }));
+      setProducts(formattedProducts);
+    };
+    
+    fetchProducts();
+  }, []);
 
+  // دالة الإضافة للسلة
   const handleAddToCart = (product) => {
-    addToCart(product);
+    const formattedProduct = {
+      ...product,
+      text: product.name,
+      files: product.files || [product.image],
+      quantity: 1
+    };
+    addToCart(formattedProduct);
     setToast({ show: true, message: "ADD SUCCESSFULLY" });
     setTimeout(() => setToast({ show: false, message: "" }), 2000);
   };
 
+  // دالة الإضافة للـ Wishlist الموحدة
   const handleWishlistClick = (product) => {
-    if (addToWishlist) {
-      addToWishlist(product);
-      setToast({ show: true, message: "Done" });
-      setTimeout(() => setToast({ show: false, message: "" }), 2000);
-    }
+    const formattedProduct = {
+      ...product,
+      text: product.name,
+      files: product.files || [product.image]
+    };
+    addToWishlist(formattedProduct);
+    setToast({ show: true, message: "Done" });
+    setTimeout(() => setToast({ show: false, message: "" }), 2000);
   };
 
   const handleNavClick = (path, tabName) => {
@@ -68,7 +75,7 @@ const Shop = () => {
 
   return (
     <div className="shop-container">
-      {/* الرسالة المطلوبة في نصف الشاشة */}
+      {/* رسالة التأكيد (Toast) في منتصف الشاشة */}
       {toast.show && (
         <div className="toast-overlay">
           <div className="toast-box">{toast.message}</div>
@@ -83,20 +90,31 @@ const Shop = () => {
         <div className="main-border-frame">
           
           <header className="navbar">
-            <div className="brand-logo">Dress On Me</div>
+            <div className="brand-logo" onClick={() => navigate("/home")} style={{cursor: "pointer"}}>Dress On Me</div>
             <nav className="nav-links-pill">
-                <a href="#!" className={activeTab === "home" ? "nav-item active" : "nav-item"} onClick={() => handleNavClick("/Home", "home")}>Home</a>
-                <a href="#!" className={activeTab === "shop" ? "nav-item active" : "nav-item"} onClick={() => handleNavClick("/shop", "shop")}>Shop</a>
-                <a href="#!" className={activeTab === "service" ? "nav-item active" : "nav-item"} onClick={() => handleNavClick("/service", "service")}>Service</a>
-                <a href="#!" className={activeTab === "contact" ? "nav-item active" : "nav-item"} onClick={() => handleNavClick("/Contact", "contact")}>Contact</a>
+                <span className={activeTab === "home" ? "nav-item active" : "nav-item"} 
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleNavClick("/home", "home")}>Home</span>
+                
+                <span className={activeTab === "shop" ? "nav-item active" : "nav-item"} 
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleNavClick("/shop", "shop")}>Shop</span>
+                
+                <span className={activeTab === "service" ? "nav-item active" : "nav-item"} 
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleNavClick("/service", "service")}>Service</span>
+                
+                <span className={activeTab === "contact" ? "nav-item active" : "nav-item"} 
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleNavClick("/contact", "contact")}>Contact</span>
                 
                 <div className="nav-icons-group">
-                    <FaUserCircle className="profile-icon" onClick={() => navigate("/profile")} />
-                    <div className="cart-wrapper" onClick={() => navigate("/wish")}>
+                    <FaUserCircle className="profile-icon" style={{ cursor: "pointer" }} onClick={() => navigate("/profile")} />
+                    <div className="cart-wrapper" style={{ cursor: "pointer" }} onClick={() => navigate("/wish")}>
                         <FaHeart className="cart-icon" />
                         {wishlist?.length > 0 && <span className="cart-badge">{wishlist.length}</span>}
                     </div>
-                    <div className="cart-wrapper" onClick={() => navigate("/Cart")}>
+                    <div className="cart-wrapper" style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
                         <FaShoppingCart className="cart-icon" />
                         {cart?.length > 0 && <span className="cart-badge">{cart.length}</span>}
                     </div>
@@ -143,33 +161,68 @@ const Shop = () => {
           </div>
 
           <section className="products-grid">
-            {products.map((item) => (
-              <div className="product-card" key={item.id}>
-                <div className="product-img-container">
-                  <img src={item.image} alt={item.name} />
-                </div>
-                <div className="product-details">
-                  <span className="brand-tag">{item.brand}</span>
-                  <h4 className="item-name">{item.name}</h4>
-                  <div className="rating-stars">
-                    {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className={i < item.rating ? "star yellow" : "star gray"} />
-                    ))}
+            {products.length > 0 ? (
+              products.map((item) => (
+                <div 
+                  className="product-card" 
+                  key={item.id}
+                  onClick={() => navigate("/profile", { state: { scrollToPostId: item.id } })}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="product-img-container" style={{ backgroundColor: "#f9f9f9", overflow: "hidden" }}>
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain"
+                      }}
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/300?text=No+Image";
+                      }}
+                    />
                   </div>
-                  <div className="card-footer">
-                    <span className="price-text">${item.price}</span>
-                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                        <button className="wishlist-btn-text" onClick={() => handleWishlistClick(item)}>
-                          wish list
-                        </button>
-                        <button className="add-btn" onClick={() => handleAddToCart(item)}>
-                          <FaCartPlus />
-                        </button>
+                  <div className="product-details">
+                    <span className="brand-tag">{item.brand}</span>
+                    <h4 className="item-name">{item.name}</h4>
+                    <div className="rating-stars">
+                      {[...Array(5)].map((_, i) => (
+                        <FaStar key={i} className={i < item.rating ? "star yellow" : "star gray"} />
+                      ))}
+                    </div>
+                    <div className="card-footer">
+                      <span className="price-text">${item.price}</span>
+                      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                          <button 
+                            className="wishlist-btn-text" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleWishlistClick(item);
+                            }}
+                          >
+                            wish list
+                          </button>
+                          <button 
+                            className="add-btn" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCart(item);
+                            }}
+                          >
+                            <FaCartPlus />
+                          </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "50px" }}>
+                <h3>No products available yet</h3>
+                <p>Check back later for new items!</p>
               </div>
-            ))}
+            )}
           </section>
 
         </div>

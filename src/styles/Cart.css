@@ -28,6 +28,9 @@
   padding-top: 60px; /* دفع النص للأسفل قليلاً ليبتعد عن الناف بار */
   text-align: center;
 }
+.cover-text p{
+  color: cornsilk;
+}
 
 .quantity-control button {
     width: 25px;

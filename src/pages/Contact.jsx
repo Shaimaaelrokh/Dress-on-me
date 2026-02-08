@@ -1,99 +1,141 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // استيراد الهوك الخاص بالتنقل
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Contact = () => {
-  const navigate = useNavigate(); // تعريف الـ navigate
+  const navigate = useNavigate();
+
+  // تنسيق داخلي للخطوط والألوان المستوحاة من الصورة
+  const styles = {
+    pageContainer: {
+      backgroundColor: '#f4ede4', // لون الخلفية الكريمي
+      fontFamily: '"Playfair Display", serif', // خط كلاسيكي (يفضل إضافته في index.html)
+      minHeight: '100vh',
+      padding: '50px 0'
+    },
+    heroSection: {
+      textAlign: 'center',
+      padding: '60px 20px',
+      color: '#5d4037'
+    },
+    contactCard: {
+      backgroundColor: '#ffffff',
+      maxWidth: '700px',
+      margin: '0 auto',
+      padding: '40px',
+      borderRadius: '0px', // الصورة حوافها حادة
+      boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+    },
+    inputField: {
+      border: 'none',
+      borderBottom: '1px solid #d7ccc8', // خط سفلي فقط كالموجود بالصورة
+      borderRadius: '0',
+      padding: '10px 0',
+      marginBottom: '20px',
+      backgroundColor: 'transparent'
+    },
+    submitBtn: {
+      backgroundColor: '#8d6e63', // لون بني ترابي
+      color: 'white',
+      border: 'none',
+      borderRadius: '0',
+      padding: '12px 40px',
+      letterSpacing: '2px',
+      textTransform: 'uppercase',
+      fontSize: '14px',
+      marginTop: '20px'
+    },
+    backLink: {
+      color: '#8d6e63',
+      textDecoration: 'none',
+      fontSize: '13px',
+      cursor: 'pointer',
+      display: 'inline-block',
+      marginTop: '20px',
+      borderBottom: '1px solid #8d6e63'
+    }
+  };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: '#f8f9fa' }}>
-      <div className="card shadow-sm p-4" style={{ maxWidth: '800px', width: '100%', borderRadius: '10px' }}>
-        
-        {/* زرار Home بالأعلى */}
-        <div className="d-flex justify-content-start mb-3">
-          <button 
-            className="btn btn-outline-dark btn-sm fw-bold" 
-            onClick={() => navigate('/home')}
-          >
-            🏠 Home
-          </button>
-        </div>
+    <div style={styles.pageContainer}>
+      {/* قسم العنوان العلوي */}
+      <div style={styles.heroSection}>
+        <h1 style={{ fontSize: '3rem', fontWeight: '300', marginBottom: '10px' }}>
+          Ready to slow <br /> down, tune in, and <br /> get aligned?
+        </h1>
+        <p style={{ letterSpacing: '1px', fontSize: '0.9rem', opacity: '0.8' }}>
+          (MENTALLY, EMOTIONALLY, AND PHYSICALLY)
+        </p>
+      </div>
 
-        <div className="text-center mb-4">
-          <h2 className="fw-bold" style={{ color: '#333' }}>Contact Us</h2>
-          <p className="text-muted">Have questions or feedback? We'd love to hear from you!</p>
+      <div style={styles.contactCard}>
+        <div className="text-center mb-5">
+          <h2 style={{ fontSize: '2.5rem', fontWeight: '300' }}>Inquire Here</h2>
+          <p className="text-muted small">
+            Fill out the contact form below to inquire about our services. <br />
+            You can expect a response within 24 hours!
+          </p>
         </div>
 
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="row">
-            {/* Your Name */}
             <div className="col-md-6 mb-3">
-              <label className="form-label fw-bold small">Your Name</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="Enter your full name" 
-                style={{ backgroundColor: '#f1f3f5' }}
-              />
+              <label className="small text-uppercase" style={{ color: '#8d6e63' }}>First Name (required)</label>
+              <input type="text" className="form-control" style={styles.inputField} />
             </div>
-
-            {/* Email Address */}
             <div className="col-md-6 mb-3">
-              <label className="form-label fw-bold small">Email Address</label>
-              <input 
-                type="email" 
-                className="form-control" 
-                placeholder="Enter your email address" 
-                style={{ backgroundColor: '#f1f3f5' }}
-              />
+              <label className="small text-uppercase" style={{ color: '#8d6e63' }}>Last Name</label>
+              <input type="text" className="form-control" style={styles.inputField} />
             </div>
           </div>
 
-          <div className="row">
-            {/* Subject */}
-            <div className="col-md-6 mb-3">
-              <label className="form-label fw-bold small">Subject</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="Enter the subject" 
-                style={{ backgroundColor: '#f1f3f5' }}
-              />
-            </div>
-
-            {/* Message */}
-            <div className="col-md-6 mb-3">
-              <label className="form-label fw-bold small">Message</label>
-              <textarea 
-                className="form-control" 
-                rows="4" 
-                placeholder="Write your message here..." 
-                style={{ backgroundColor: '#f1f3f5' }}
-              ></textarea>
-            </div>
+          <div className="mb-4">
+            <label className="small text-uppercase" style={{ color: '#8d6e63' }}>Email (required)</label>
+            <input type="email" className="form-control" style={styles.inputField} />
           </div>
 
-          {/* Send Message Button */}
-          <div className="d-grid gap-2 mb-3">
-            <button className="btn btn-primary py-2 fw-bold" type="submit" style={{ backgroundColor: '#007bff' }}>
-              Send Message
-            </button>
+          <div className="mb-4">
+            <label className="small text-uppercase" style={{ color: '#8d6e63' }}>Subject (required)</label>
+            <input type="text" className="form-control" style={styles.inputField} />
           </div>
 
-          {/* Back to Store Button - متصل بصفحة المتجر */}
+          <div className="mb-4">
+            <label className="small text-uppercase" style={{ color: '#8d6e63' }}>Message (required)</label>
+            <textarea className="form-control" rows="3" style={styles.inputField}></textarea>
+          </div>
+
           <div className="text-center">
-            <button 
-              type="button"
-              className="btn btn-secondary px-4 py-2" 
-              style={{ backgroundColor: '#6c757d', border: 'none' }}
-              onClick={() => navigate('/shop')}
-            >
-              Back to Store
+            <button style={styles.submitBtn} type="submit">
+              SUBMIT
             </button>
+          </div>
+
+          <div className="text-center mt-3">
+             <span style={styles.backLink} onClick={() => navigate('/home')}>Back to Home</span>
+             <span className="mx-2">|</span>
+             <span style={styles.backLink} onClick={() => navigate('/shop')}>Back to Store</span>
           </div>
         </form>
-
       </div>
+
+      {/* الجزء السفلي (Footer المماثل للصورة) */}
+      <footer className="text-center mt-5" style={{ color: '#5d4037', padding: '40px' }}>
+        <p className="small text-uppercase" style={{ letterSpacing: '2px' }}>Let's Connect</p>
+        <div className="d-flex justify-content-center gap-5 mt-4">
+          <div>
+            <h5 style={{ fontWeight: '300' }}>Instagram</h5>
+            <p className="small border-bottom border-secondary d-inline-block">FOLLOW ALONG</p>
+          </div>
+          <div>
+            <h5 style={{ fontWeight: '300' }}>Pinterest</h5>
+            <p className="small border-bottom border-secondary d-inline-block">GET INSPIRED</p>
+          </div>
+          <div>
+            <h5 style={{ fontWeight: '300' }}>Email</h5>
+            <p className="small border-bottom border-secondary d-inline-block">GET IN TOUCH</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

@@ -14,6 +14,8 @@ import Contact from "./pages/Contact";
 import Chat from "./pages/chat";   
 import Viton from "./pages/viton"; 
 import Outfits from "./pages/Outfits"; 
+// إضافة استدعاء الملف الجديد هنا
+import Vichat from "./pages/vichat"; 
 
 function App() {
   return (
@@ -27,8 +29,15 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/wish" element={<Wishlist />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/viton" element={<Viton />} />
+    
+        
+        
+        {/* ملف viton القديم زي ما هو */}
+        <Route path="/viton" element={<Viton />} /> 
+        
+        {/* إضافة ملف vichat الجديد بمسار جديد */}
+        <Route path="/vichat" element={<Vichat />} /> 
+        
         <Route path="/outfits" element={<Outfits />} />
       </Routes>
     </CartProvider>

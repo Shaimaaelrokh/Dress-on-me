@@ -28,7 +28,7 @@ import omaar from "../assets/omar.jpg";
 import malekImg from "../assets/malek.jpg"; 
 
 // أيقونات
-import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube, FaShoppingCart, FaUserCircle, FaRobot } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube, FaShoppingCart, FaUserCircle, FaRobot, FaCamera } from "react-icons/fa";
 import { GiClothes } from "react-icons/gi";
 
 export default function Home() {
@@ -60,7 +60,7 @@ export default function Home() {
               size={22}
               style={{ cursor: "pointer" }}
               title="AI Assistant"
-              onClick={() => navigate("/chat")}
+              onClick={() => navigate("/vichat")}
             />
             <GiClothes 
               size={24}
