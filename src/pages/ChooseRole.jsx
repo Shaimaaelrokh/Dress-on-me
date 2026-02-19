@@ -1,61 +1,83 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";   
+import { useNavigate } from "react-router-dom";
 import "../styles/ChooseRole.css";
-import customerImg from "../assets/customer.jpg";
-import sellerImg from "../assets/seller.jpg";
+import customerBg from "../assets/clutch.jpg"; 
+import sellerBg from "../assets/ff.jpg";    
 
 export default function ChooseRole() {
-  const [role, setRole] = useState(null);
-  const [displayName, setDisplayName] = useState(""); 
-  const navigate = useNavigate();   
+  const [isSeller, setIsSeller] = useState(false); 
+  const [displayName, setDisplayName] = useState("");
+  const navigate = useNavigate();
 
-  const handleCreate = () => {
-      // حفظ البيانات لضمان عدم مسحها عند التنقل بين الصفحات
-      localStorage.setItem("u_role", role); 
-      localStorage.setItem("u_name", displayName || (role === "seller" ? "New Seller" : "New Customer"));
-      navigate("/profile");
+  const handleCreate = (role) => {
+    localStorage.setItem("u_role", role);
+    localStorage.setItem("u_name", displayName || (role === "seller" ? "New Seller" : "New Customer"));
+    navigate("/profile");
   };
 
   return (
-    <div className="role-container">
-      {!role && (
-        <div className="role-boxes">
-          <div className="role-box image-box" onClick={() => setRole("customer")}>
-            <img src={customerImg} alt="Customer" />
-            <div className="overlay"><h2>Customer</h2></div>
+    <div className="role-body">
+      <div className={`role-container ${isSeller ? "right-panel-active" : ""}`} id="container">
+        
+        {/* فورم السيلر */}
+        <div className="form-container seller-container">
+          <div className="form-box">
+            <h1>Seller Profile</h1>
+            <span>Fill in your store details</span>
+            <input type="text" placeholder="Display Name" onChange={(e) => setDisplayName(e.target.value)} />
+            <input type="number" placeholder="Age" />
+            <input type="text" placeholder="Product Type" />
+            <select>
+              <option value="">Payment Method</option>
+              <option>Cash</option>
+              <option>Credit Card</option>
+            </select>
+            <button className="main-btn" onClick={() => handleCreate("seller")}>Create Seller Account</button>
           </div>
-          <div className="role-box image-box" onClick={() => setRole("seller")}>
-            <img src={sellerImg} alt="Seller" />
-            <div className="overlay"><h2>Seller</h2></div>
+        </div>
+
+        {/* فورم الكاستمر */}
+        <div className="form-container customer-container">
+          <div className="form-box">
+            <h1>Customer Profile</h1>
+            <span>Join us as a buyer</span>
+            <input type="text" placeholder="Display Name" onChange={(e) => setDisplayName(e.target.value)} />
+            <input type="number" placeholder="Age" />
+            <select>
+              <option value="">Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+            <input type="text" placeholder="Favorite Colors" />
+            <button className="main-btn" onClick={() => handleCreate("customer")}>Create Customer Account</button>
           </div>
         </div>
-      )}
 
-      {role === "customer" && (
-        <div className="form-box">
-          <h2>Customer Profile</h2>
-          <input type="text" placeholder="Display Name" onChange={(e) => setDisplayName(e.target.value)} />
-          <input type="number" placeholder="Age" />
-          <select><option value="">Gender</option><option>Male</option><option>Female</option></select>
-          <input type="text" placeholder="Favorite Colors" />
-          <button onClick={handleCreate}>Create Profile</button>
-        </div>
-      )}
+        {/* الجزء المتحرك (Overlay) */}
+        <div className="overlay-container">
+          <div className="overlay">
+            {/* الناحية الشمال - خلفية الكاستمر */}
+            <div 
+              className="overlay-panel overlay-left" 
+              style={{ backgroundImage: `url(${customerBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+              <h1 style={{ color: 'white' }}>Welcome Back!</h1>
+              <p style={{ color: 'white' }}>To stay connected as a customer, please switch here</p>
+              <button className="ghost-btn" onClick={() => setIsSeller(false)}>I am a Customer</button>
+            </div>
 
-      {role === "seller" && (
-        <div className="form-box">
-          <h2>Seller Profile</h2>
-          <input type="text" placeholder="Display Name" onChange={(e) => setDisplayName(e.target.value)} />
-          <input type="number" placeholder="Age" />
-          <input type="text" placeholder="Product Type" />
-          <select>
-            <option value="">Preferred Payment Method</option>
-            <option>Cash</option>
-            <option>Credit Card</option>
-          </select>
-          <button onClick={handleCreate}>Create Profile</button>
+            {/* الناحية اليمين - خلفية السيلر */}
+            <div 
+              className="overlay-panel overlay-right" 
+              style={{ backgroundImage: `url(${sellerBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+              <h1 style={{ color: 'white' }}>Hello, Partner!</h1>
+              <p style={{ color: 'white' }}>Enter your details and start your selling journey with us</p>
+              <button className="ghost-btn" onClick={() => setIsSeller(true)}>I am a Seller</button>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import loginpic from "../assets/loginn.jpg";
 
@@ -8,7 +8,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/choose-role");
+    navigate("/home"); // التعديل هنا ليقوم بالتحويل لصفحة الهوم
   };
 
   return (
@@ -91,9 +91,9 @@ const Login = () => {
         </form>
         <p style={{ marginTop: "20px", color: "#555" }}>
           Don't have an account?{" "}
-          <a href="#" style={{ color: "#6c63ff" }}>
+          <Link to="/choose-role" style={{ color: "#6c63ff" }}>
             Sign Up
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -29,6 +29,35 @@ const Vichat = () => {
     }
   };
 
+  //خلوا بالكم دي بس عشان اضغط الصور عشان اقدر اخد اكبر عدد من التوكينز 
+  const processImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          //صغرت ل 500 بيكسل 
+          const MAX_WIDTH = 500;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          //الصيغه دي بتخلب الكواليتي قل سنه بس مقبوله جدا بس كويسه للمساحه ولعدد التوكينز 
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+          resolve(compressedBase64);
+        };
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -58,7 +87,10 @@ const Vichat = () => {
 
     try {
       let imageBase64 = "";
-      if (currentImage) imageBase64 = await fileToBase64(currentImage);
+      if (currentImage) {
+        // استخدام دالة الضغط هنا بدلاً من fileToBase64 العادية
+        imageBase64 = await processImage(currentImage);
+      }
 
       const messageContent = [{ type: "text", text: userText || "Analyze this picture" }];
       if (imageBase64) messageContent.push({ type: "image_url", image_url: `data:image/jpeg;base64,${imageBase64}` });
@@ -78,7 +110,8 @@ const Vichat = () => {
 
       setMessages(prev => [...prev, { role: "assistant", text: response.data.choices[0].message.content }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: "assistant", text: "حدث خطأ في الاتصال." }]);
+      console.error("Mistral Error:", error.response?.data || error.message);
+      setMessages(prev => [...prev, { role: "assistant", text: "حدث خطأ في الاتصال أو تم تجاوز الحد المسموح." }]);
     } finally {
       setLoading(false);
     }
@@ -112,7 +145,7 @@ const Vichat = () => {
       left: 0,
       width: '100%',
       height: '100%',
-      backgroundColor: 'rgba(0,0,0,0.1)', // إضافة تعتيم خفيف للفيديو لزيادة الوضوح
+      backgroundColor: 'rgba(0,0,0,0.1)', 
       zIndex: -1
     },
     mainCard: {
@@ -125,7 +158,7 @@ const Vichat = () => {
       overflow: 'hidden',
       boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
       position: 'relative',
-      backdropFilter: 'blur(10px)' // زيادة الـ blur لجمالية أكثر
+      backdropFilter: 'blur(10px)' 
     },
     sideIconsBar: {
       width: '70px',
@@ -260,7 +293,7 @@ const Vichat = () => {
               <FaImage size={20} />
               <input 
                 type="file" 
-                accept="image/png, image/jpeg, image/jpg, image/webp" // التعديل هنا لضمان ظهور المعاينة
+                accept="image/png, image/jpeg, image/jpg, image/webp"
                 onChange={handleImageChange} 
                 style={{ display: 'none' }} 
               />

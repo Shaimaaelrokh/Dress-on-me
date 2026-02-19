@@ -78,15 +78,7 @@ export default function Home() {
           </div>
         </nav>
 
-        <div className="overlay">
-          <div className="container text-center">
-            <h1 className="brand-title">COUTURE</h1>
-            <p className="brand-sub">
-              Every woman deserves to feel unique & beautiful
-            </p>
-            <button className="btn btn-light px-5 py-2 mt-3">Explore Collection</button>
-          </div>
-        </div>
+        
       </section>
 
       {/* VALUES SECTION */}
