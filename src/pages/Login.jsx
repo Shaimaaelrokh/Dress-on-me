@@ -8,7 +8,9 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/home"); // التعديل هنا ليقوم بالتحويل لصفحة الهوم
+
+    
+    navigate("/profile")
   };
 
   return (
@@ -37,14 +39,20 @@ const Login = () => {
           width: "100%",
           maxWidth: "600px",
           textAlign: "center",
-          
         }}
       >
-        <h2 style={{ marginBottom: "30px", fontWeight: "700", color: "#6a0202e2" }}>
+        <h2
+          style={{
+            marginBottom: "30px",
+            fontWeight: "700",
+            color: "#6a0202e2",
+          }}
+        >
           Start your journey!
         </h2>
+
         <form onSubmit={handleSubmit}>
-          <div className="mb-3 text-start" style={{color: "#000000"}}>
+          <div className="mb-3 text-start" style={{ color: "#000000" }}>
             <label htmlFor="email" className="form-label fw-semibold">
               Email address
             </label>
@@ -56,7 +64,8 @@ const Login = () => {
               required
             />
           </div>
-          <div className="mb-3 text-start" style={{color: "#000000"}}>
+
+          <div className="mb-3 text-start" style={{ color: "#000000" }}>
             <label htmlFor="password" className="form-label fw-semibold">
               Password
             </label>
@@ -68,6 +77,7 @@ const Login = () => {
               required
             />
           </div>
+
           <button
             type="submit"
             style={{
@@ -89,6 +99,7 @@ const Login = () => {
             Login
           </button>
         </form>
+
         <p style={{ marginTop: "20px", color: "#555" }}>
           Don't have an account?{" "}
           <Link to="/choose-role" style={{ color: "#6c63ff" }}>

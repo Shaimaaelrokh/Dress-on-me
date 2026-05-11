@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle, FaShoppingCart, FaStar, FaCartPlus, FaHeart } from "react-icons/fa";
+import { FaUserCircle, FaShoppingCart, FaStar, FaCartPlus, FaHeart, FaSearch } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
 import { getPosts } from "../api/api";
+import Fuse from "fuse.js";
 import "../styles/Shop.css";
 
-// استيراد كافة الصور المستخدمة في المشروع (للخلفية والصور الجانبية فقط)
+// استيراد كافة الصور المستخدمة في المشروع
 import mainBg from "../assets/lery.jpg"; 
 import sideImg1 from "../assets/azza.jpg"; 
 import sideImg2 from "../assets/zz.jpg"; 
@@ -16,34 +17,75 @@ const Shop = () => {
   const { cart, addToCart, addToWishlist, wishlist } = useCart(); 
   const [activeTab, setActiveTab] = useState("shop");
   
-  // حالة التحكم في ظهور رسالة التأكيد (Toast)
   const [toast, setToast] = useState({ show: false, message: "" });
-  
-  // حالة جديدة لتخزين المنتجات من البروفايل
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
-  // جلب المنتجات من البوستات عند تحميل الصفحة
+  // جلب المنتجات وإضافة تصنيفات تلقائية (Tags)
   useEffect(() => {
     const fetchProducts = async () => {
       const posts = await getPosts();
-      // تحويل البوستات لصيغة المنتجات
-      const formattedProducts = posts.map(post => ({
-        id: post.id,
-        brand: post.user || "Seller",
-        name: post.text || "Product",
-        price: post.price || 0,
-        rating: post.rating || 0,
-        image: post.files && post.files.length > 0 ? post.files[0] : "https://via.placeholder.com/300",
-        files: post.files || [],
-        text: post.text
-      }));
+      const formattedProducts = posts.map(post => {
+        // تحويل النص لـ Lowercase لسهولة المقارنة
+        const description = (post.text || "").toLowerCase();
+        
+        // منطق التصنيف التلقائي بناءً على الكلمات المفتاحية
+        let tags = [];
+        if (description.includes("bag") || description.includes("شنطة") || description.includes("leather") || description.includes("clutch")) {
+          tags.push("bags");
+        }
+        if (description.includes("dress") || description.includes("فستان") || description.includes("silk") || description.includes("gown")) {
+          tags.push("dresses");
+        }
+        if (description.includes("accessory") || description.includes("jewelry") || description.includes("ring") || description.includes("necklace")) {
+          tags.push("accessories");
+        }
+        if (description.includes("shoes") || description.includes("شوز") || description.includes("heels")) {
+          tags.push("shoes");
+        }
+
+        return {
+          id: post.id,
+          brand: post.user || "Seller",
+          name: post.text || "Product",
+          price: post.price || 0,
+          rating: post.rating || 0,
+          image: post.files && post.files.length > 0 ? post.files[0] : "https://via.placeholder.com/300",
+          files: post.files || [],
+          text: post.text,
+          tags: tags // إضافة التاجات للمنتج
+        };
+      });
       setProducts(formattedProducts);
+      setFilteredProducts(formattedProducts);
     };
     
     fetchProducts();
   }, []);
 
-  // دالة الإضافة للسلة
+  // تنفيذ البحث الذكي (Fuzzy Search + Categorization)
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredProducts(products);
+      return;
+    }
+
+    const fuse = new Fuse(products, {
+      keys: [
+        { name: "tags", weight: 0.8 }, // الأولوية القصوى للتصنيف (مثل bags)
+        { name: "name", weight: 0.5 },
+        { name: "brand", weight: 0.3 },
+        { name: "text", weight: 0.2 }
+      ],
+      threshold: 0.4, // توازن بين الدقة والمرونة
+      distance: 100,
+    });
+
+    const results = fuse.search(searchTerm);
+    setFilteredProducts(results.map(result => result.item));
+  }, [searchTerm, products]);
+
   const handleAddToCart = (product) => {
     const formattedProduct = {
       ...product,
@@ -56,7 +98,6 @@ const Shop = () => {
     setTimeout(() => setToast({ show: false, message: "" }), 2000);
   };
 
-  // دالة الإضافة للـ Wishlist الموحدة
   const handleWishlistClick = (product) => {
     const formattedProduct = {
       ...product,
@@ -75,7 +116,6 @@ const Shop = () => {
 
   return (
     <div className="shop-container">
-      {/* رسالة التأكيد (Toast) في منتصف الشاشة */}
       {toast.show && (
         <div className="toast-overlay">
           <div className="toast-box">{toast.message}</div>
@@ -100,9 +140,7 @@ const Shop = () => {
                       style={{ cursor: "pointer" }}
                       onClick={() => handleNavClick("/shop", "shop")}>Shop</span>
                 
-                <span className={activeTab === "service" ? "nav-item active" : "nav-item"} 
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleNavClick("/service", "service")}>Service</span>
+            
                 
                 <span className={activeTab === "contact" ? "nav-item active" : "nav-item"} 
                       style={{ cursor: "pointer" }}
@@ -160,9 +198,33 @@ const Shop = () => {
             </aside>
           </div>
 
+          {/* شريط البحث المصمم ليناسب Glass Overlay */}
+          <div className="search-section" style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+            <div style={{ position: 'relative', width: '100%', maxWidth: '450px' }}>
+              <FaSearch style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.6)' }} />
+              <input 
+                type="text" 
+                placeholder="Search by product name or category (e.g., bags, dresses)..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '14px 20px 14px 50px',
+                  borderRadius: '30px',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(10px)',
+                  color: '#fff',
+                  outline: 'none',
+                  fontSize: '1rem'
+                }}
+              />
+            </div>
+          </div>
+
           <section className="products-grid">
-            {products.length > 0 ? (
-              products.map((item) => (
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((item) => (
                 <div 
                   className="product-card" 
                   key={item.id}
@@ -219,8 +281,8 @@ const Shop = () => {
               ))
             ) : (
               <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "50px" }}>
-                <h3>No products available yet</h3>
-                <p>Check back later for new items!</p>
+                <h3>No products found for "{searchTerm}"</h3>
+                <p>Try searching for categories like bags, dresses, or accessories.</p>
               </div>
             )}
           </section>

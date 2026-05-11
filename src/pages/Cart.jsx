@@ -30,24 +30,51 @@ const Cart = () => {
   const shipping = cartItems.length > 0 ? 20 : 0;
 
   const subtotal = cartItems.reduce((acc, item) => {
-    const price = parseFloat(item.price) || 0; 
+    // ✅ استخدام cartPrice لو موجود (السعر الصح للمنتج المختار)
+    const price = parseFloat(item.cartPrice || item.price) || 0; 
     const quantity = parseInt(item.quantity) || 1;
     return acc + (price * quantity);
   }, 0);
 
   const totalAmount = subtotal + shipping;
 
+  // ✅ جيب صورة المنتج المضاف فعلاً (cartImage أولاً)
   const getImageUrl = (item) => {
-    if (!item.files || item.files.length === 0) {
-      return "https://via.placeholder.com/70?text=No+Image";
+    // لو في صورة مخصوصة للمنتج المختار
+    if (item.cartImage) return item.cartImage;
+    // وإلا جيب أول صورة
+    if (item.files && item.files.length > 0) {
+      return item.files[0] || "https://via.placeholder.com/70?text=No+Image";
     }
-    return item.files[0] || "https://via.placeholder.com/70?text=Invalid";
+    return "https://via.placeholder.com/70?text=No+Image";
+  };
+
+  // ✅ اسم المنتج مع التفاصيل
+  const getDisplayName = (item) => {
+    return item.cartDisplayName || item.text || "Product";
+  };
+
+  // ✅ السعر الصح للعرض
+  const getItemPrice = (item) => {
+    return parseFloat(item.cartPrice || item.price) || 0;
   };
 
   return (
     <div className="cart-page">
-      {/* Section Cover */}
-      <section className="cart-cover" style={{ backgroundImage: `url(${carrtImg})` }}>
+      {/* ✅ Section Cover - تم تصليح مشكلة الخلفية المقطوعة */}
+      <section 
+        className="cart-cover" 
+        style={{ 
+          backgroundImage: `url(${carrtImg})`,
+          minHeight: "320px",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <nav className="carrt-nav-overlay">
           <div className="nav-links">
             <a href="#!" onClick={(e) => { e.preventDefault(); navigate("/home"); }}>Home</a>
@@ -59,7 +86,7 @@ const Cart = () => {
             <FaShoppingCart className="cart-icon" size={20} style={{ color: "#ffc107", cursor: "pointer" }} />
           </div>
         </nav>
-        <div className="cover-text">
+        <div className="cover-text" style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             <h1># Your Cart</h1>
             <p>Review your selected items before checkout!</p>
         </div>
@@ -74,6 +101,7 @@ const Cart = () => {
                   <th>DELETE</th>
                   <th>IMAGE</th>
                   <th>PRODUCT</th>
+                  <th>DETAILS</th>
                   <th>UNIT PRICE</th>
                   <th>QUANTITY</th>
                   <th>SUBTOTAL</th>
@@ -81,9 +109,10 @@ const Cart = () => {
               </thead>
               <tbody>
                 {cartItems.map((item) => {
-                  const itemPrice = parseFloat(item.price) || 0;
+                  const itemPrice = getItemPrice(item);
                   const itemQty = parseInt(item.quantity) || 1;
                   const itemImage = getImageUrl(item);
+                  const displayName = getDisplayName(item);
 
                   return (
                     <tr key={item.id}>
@@ -95,25 +124,50 @@ const Cart = () => {
                         />
                       </td>
                       <td>
+                        {/* ✅ صورة المنتج المختار فعلاً */}
                         <img 
                           src={itemImage} 
                           alt="product" 
                           className="cart-product-img" 
                           style={{ 
-                            width: "70px", 
-                            height: "70px", 
-                            borderRadius: "8px", 
-                            objectFit: "cover" 
+                            width: "80px", 
+                            height: "80px", 
+                            borderRadius: "10px", 
+                            objectFit: "cover",
+                            border: "2px solid #f0f0f0",
                           }}
                           onError={(e) => {
-                            e.target.src = "https://via.placeholder.com/70?text=Error";
+                            e.target.src = "https://via.placeholder.com/80?text=No+Image";
                           }}
                         />
                       </td>
-                      <td className="text-truncate" style={{maxWidth: "150px"}}>
-                        {item.text || "No Name Product"}
+                      <td className="text-start" style={{ maxWidth: "160px" }}>
+                        {/* ✅ اسم المنتج */}
+                        <div className="fw-bold text-truncate">{displayName}</div>
+                        {/* ✅ الكاتيجوري لو موجودة */}
+                        {item.cartCategory && (
+                          <div className="text-muted small mt-1">📦 {item.cartCategory}</div>
+                        )}
                       </td>
-                      <td>${itemPrice.toFixed(2)}</td>
+                      <td>
+                        {/* ✅ تفاصيل الاختيار (المقاس واللون) */}
+                        <div className="d-flex flex-column align-items-center gap-1">
+                          {item.selectedSize && (
+                            <span className="badge bg-primary rounded-pill" style={{ fontSize: "0.7rem" }}>
+                              Size: {item.selectedSize}
+                            </span>
+                          )}
+                          {item.selectedColor && (
+                            <span className="badge bg-secondary rounded-pill" style={{ fontSize: "0.7rem" }}>
+                              Color: {item.selectedColor}
+                            </span>
+                          )}
+                          {!item.selectedSize && !item.selectedColor && (
+                            <span className="text-muted small">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="fw-bold">${itemPrice.toFixed(2)}</td>
                       <td>
                         <div className="quantity-control d-flex justify-content-center align-items-center gap-2">
                           <button 
@@ -132,7 +186,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="fw-bold">${(itemPrice * itemQty).toFixed(2)}</td>
+                      <td className="fw-bold text-success">${(itemPrice * itemQty).toFixed(2)}</td>
                     </tr>
                   );
                 })}
@@ -189,42 +243,27 @@ const Cart = () => {
         )}
       </div>
 
-      {/* البوكس الأسود للتأكيد */}
+      {/* تأكيد الحذف */}
       {confirmDelete.show && (
         <div
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.7)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 9999,
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.7)", display: "flex",
+            justifyContent: "center", alignItems: "center", zIndex: 9999,
           }}
         >
           <div
             style={{
-              backgroundColor: "#000",
-              color: "#fff",
-              padding: "30px",
-              borderRadius: "10px",
-              textAlign: "center",
-              maxWidth: "90%",
+              backgroundColor: "#000", color: "#fff", padding: "30px",
+              borderRadius: "10px", textAlign: "center", maxWidth: "90%",
             }}
           >
-            <p style={{ fontSize: "18px", marginBottom: "20px", color:"white" }}>
+            <p style={{ fontSize: "18px", marginBottom: "20px", color: "white" }}>
               Are you sure you want to delete this item?
             </p>
             <div className="d-flex justify-content-center gap-3">
-              <button className="btn btn-danger" onClick={confirmDeletion}>
-                Yes, Delete
-              </button>
-              <button className="btn btn-secondary" onClick={cancelDeletion}>
-                Cancel
-              </button>
+              <button className="btn btn-danger" onClick={confirmDeletion}>Yes, Delete</button>
+              <button className="btn btn-secondary" onClick={cancelDeletion}>Cancel</button>
             </div>
           </div>
         </div>
@@ -239,7 +278,6 @@ const Cart = () => {
               <p><strong>Address:</strong> Autostrad El Maadi, Cairo</p>
               <p><strong>Hours:</strong> 10:00 - 18:00, Mon - Sat</p>
             </div>
-
             <div className="col-md-4 mb-4">
               <h4 className="mb-3">About</h4>
               <ul className="list-unstyled">
@@ -249,7 +287,6 @@ const Cart = () => {
                 <li><a href="#!" className="text-white-50 text-decoration-none">Terms & Conditions</a></li>
               </ul>
             </div>
-
             <div className="col-md-4 mb-4">
               <h4 className="mb-3">Follow Us</h4>
               <div className="d-flex gap-3 fs-4">

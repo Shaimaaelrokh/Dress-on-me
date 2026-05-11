@@ -12,13 +12,15 @@ section {
 }
 
 /* HERO */
+/* HERO */
 .hero-section {
-  height: 100vh;
-  background-size: cover; /* الصورة تظهر كاملة */
-  background-position: top center;
+  width: 100%;            /* لضمان ملء العرض بالكامل مهما كان حجم الشاشة */
+  min-height: 100vh;      /* يجعل الارتفاع يساوي طول شاشة المستخدم بالكامل */
+  background-size: cover; /* تجعل الصورة تغطي المساحة بالكامل دون تمطيط */
+  background-position: center; /* توسيط الصورة */
   background-repeat: no-repeat;
   position: relative;
-  
+  overflow: hidden;       /* لمنع أي خروج للعناصر عن الحدود */
 }
 
 /* Navbar overlay */
@@ -133,7 +135,21 @@ section {
   transition: 0.3s;
 }
 
-.nav-links a:hover {
+.nav-links button.nav-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links button.nav-link:hover {
   color: #f8d6e6;
 }
 

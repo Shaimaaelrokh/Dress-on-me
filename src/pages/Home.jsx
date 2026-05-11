@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/Home.css";
 
@@ -7,47 +7,234 @@ import heroImg from "../assets/hero.jpg";
 import featureImg from "../assets/featurre.jpg";
 import backImg from "../assets/backk.jpg";
 import eleganceImg from "../assets/elegance.jpg";
-import vanImg from "../assets/sherry.jpg";   
+import vanImg from "../assets/sherry.jpg";
 import confidenceImg from "../assets/confidence.jpg";
 import innovationImg from "../assets/innovation.jpg";
-import yassImg from "../assets/yass.jpg"; 
-import mmImg from "../assets/mm.jpg"; 
-import soadImg from "../assets/soad.jpg"; 
-import individualityImg from "../assets/individuality.jpg";                 
-import bannerImg from "../assets/banner.jpg"; 
-import bannerrImg from "../assets/noor.jpg"; 
-import elegancceImg from "../assets/roushdy.jpg"; 
-import individdualityImg from "../assets/omar2.jpg"; 
-import confiddenceImg from "../assets/kareem.jpg"; 
-import innovattionImg from "../assets/haleem.jpg"; 
-import shou from "../assets/shoukry.jpg"; 
-import nourImg from "../assets/nour.jpg"; 
-import ezzImg from "../assets/Ahmedezz.jpg"; 
-import aserImg from "../assets/aser.jpg"; 
-import omaar from "../assets/omar.jpg"; 
-import malekImg from "../assets/malek.jpg"; 
+import yassImg from "../assets/yass.jpg";
+import mmImg from "../assets/mm.jpg";
+import soadImg from "../assets/soad.jpg";
+import individualityImg from "../assets/individuality.jpg";
+import bannerImg from "../assets/banner.jpg";
+import bannerrImg from "../assets/noor.jpg";
+import elegancceImg from "../assets/roushdy.jpg";
+import individdualityImg from "../assets/omar2.jpg";
+import confiddenceImg from "../assets/kareem.jpg";
+import innovattionImg from "../assets/haleem.jpg";
+import shou from "../assets/shoukry.jpg";
+import nourImg from "../assets/nour.jpg";
+import ezzImg from "../assets/Ahmedezz.jpg";
+import aserImg from "../assets/aser.jpg";
+import omaar from "../assets/omar.jpg";
+import malekImg from "../assets/malek.jpg";
 
 // أيقونات
-import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube, FaShoppingCart, FaUserCircle, FaRobot, FaCamera } from "react-icons/fa";
+import {
+  FaFacebookF, FaInstagram, FaTwitter, FaYoutube,
+  FaShoppingCart, FaUserCircle, FaRobot, FaGlobe,
+} from "react-icons/fa";
 import { GiClothes } from "react-icons/gi";
 
+// ─── باسورد الـ Dashboard ───────────────────────────────────────
+const DASHBOARD_PASSWORD = "7894561230+789456120$5";
+
+// ─── Modal Component ────────────────────────────────────────────
+function DashboardModal({ onClose, onSuccess }) {
+  const [pwd, setPwd]       = useState("");
+  const [error, setError]   = useState("");
+  const [shake, setShake]   = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
+
+  const handleSubmit = () => {
+    if (pwd === DASHBOARD_PASSWORD) {
+      onSuccess();
+    } else {
+      setError("❌ Incorrect password. Try again.");
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      setPwd("");
+    }
+  };
+
+  return (
+    /* Backdrop */
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 9999,
+        background: "rgba(0,0,0,0.65)",
+        backdropFilter: "blur(6px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}
+    >
+      {/* Card */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "linear-gradient(145deg,#0a0a0a,#1a1a2e)",
+          border: "1px solid rgba(100,180,255,0.25)",
+          borderRadius: "20px",
+          padding: "40px 36px",
+          width: "360px",
+          boxShadow: "0 0 60px rgba(50,130,255,0.2), 0 20px 40px rgba(0,0,0,0.6)",
+          animation: shake ? "shake 0.5s ease" : "fadeIn 0.3s ease",
+          color: "#fff",
+          textAlign: "center",
+        }}
+      >
+        {/* Globe Icon */}
+        <div style={{
+          width: 72, height: 72, borderRadius: "50%",
+          background: "linear-gradient(135deg,#1a6bff,#00c6ff)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          margin: "0 auto 20px",
+          boxShadow: "0 0 30px rgba(0,150,255,0.5)",
+          animation: "spinGlobe 6s linear infinite",
+        }}>
+          <FaGlobe size={34} color="#fff" />
+        </div>
+
+        <h2 style={{ fontSize: "1.3rem", fontWeight: 700, marginBottom: 6, letterSpacing: 1 }}>
+          Dashboard Access
+        </h2>
+        <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.45)", marginBottom: 24 }}>
+          Enter the admin password to continue
+        </p>
+
+        {/* Input */}
+        <div style={{ position: "relative", marginBottom: 16 }}>
+          <input
+            type={showPwd ? "text" : "password"}
+            placeholder="Enter password..."
+            value={pwd}
+            onChange={(e) => { setPwd(e.target.value); setError(""); }}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            style={{
+              width: "100%", padding: "12px 44px 12px 16px",
+              borderRadius: 10, border: "1px solid rgba(100,180,255,0.3)",
+              background: "rgba(255,255,255,0.06)",
+              color: "#fff", fontSize: "0.95rem",
+              outline: "none", boxSizing: "border-box",
+              transition: "border 0.2s",
+            }}
+          />
+          {/* Show/hide toggle */}
+          <span
+            onClick={() => setShowPwd(!showPwd)}
+            style={{
+              position: "absolute", right: 14, top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer", fontSize: "0.75rem",
+              color: "rgba(255,255,255,0.4)",
+              userSelect: "none",
+            }}
+          >
+            {showPwd ? "HIDE" : "SHOW"}
+          </span>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <p style={{ color: "#ff5e5e", fontSize: "0.82rem", marginBottom: 14 }}>
+            {error}
+          </p>
+        )}
+
+        {/* Buttons */}
+        <button
+          onClick={handleSubmit}
+          style={{
+            width: "100%", padding: "12px",
+            borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg,#1a6bff,#00c6ff)",
+            color: "#fff", fontWeight: 700, fontSize: "0.95rem",
+            cursor: "pointer", marginBottom: 10,
+            boxShadow: "0 4px 20px rgba(0,150,255,0.3)",
+            transition: "opacity 0.2s",
+          }}
+          onMouseEnter={(e) => (e.target.style.opacity = 0.85)}
+          onMouseLeave={(e) => (e.target.style.opacity = 1)}
+        >
+          Enter Dashboard
+        </button>
+
+        <button
+          onClick={onClose}
+          style={{
+            background: "none", border: "none",
+            color: "rgba(255,255,255,0.35)", cursor: "pointer",
+            fontSize: "0.82rem",
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+
+      {/* Animations */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shake {
+          0%,100%{ transform: translateX(0); }
+          20%    { transform: translateX(-8px); }
+          40%    { transform: translateX(8px); }
+          60%    { transform: translateX(-5px); }
+          80%    { transform: translateX(5px); }
+        }
+        @keyframes spinGlobe {
+          from { box-shadow: 0 0 30px rgba(0,150,255,0.5), 2px 0 0 rgba(255,255,255,0.1) inset; }
+          to   { box-shadow: 0 0 40px rgba(0,200,255,0.7), -2px 0 0 rgba(255,255,255,0.1) inset; }
+        }
+        @keyframes glowPulse {
+          0%,100%{ filter: drop-shadow(0 0 4px rgba(0,180,255,0.8)); }
+          50%    { filter: drop-shadow(0 0 12px rgba(0,180,255,1)); }
+        }
+        .earth-icon-btn {
+          animation: glowPulse 2.5s ease-in-out infinite;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        .earth-icon-btn:hover {
+          transform: scale(1.2) rotate(15deg);
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Main Component ─────────────────────────────────────────────
 export default function Home() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <div className="home-page" style={{ backgroundImage: `url(${backImg})` }}>
-      
+
       {/* HERO مع Navbar overlay */}
       <section className="hero-section" style={{ backgroundImage: `url(${heroImg})` }}>
-        {/* Navbar */}
         <nav className="navbar-overlay">
           <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: "15px" }}>
             <Link to="/home" className="nav-link">Home</Link>
             <Link to="/shop" className="nav-link">Shop</Link>
             <Link to="/blog" className="nav-link">Blog</Link>
-            <Link to="/about" className="nav-link">About</Link>
+            <button 
+              onClick={() => { window.location.href = '/Dress-on-me/makeup/index.html'; }}
+              className="nav-link"
+            >
+              Try ON Makeup
+            </button>
             <Link to="/contact" className="nav-link">Contact</Link>
             <Link to="/outfits" className="nav-link">Inspir your clothes</Link>
+
+            {/* 🌍 Earth / Dashboard Icon */}
+            <FaGlobe
+              className="earth-icon-btn"
+              size={22}
+              color="#00c6ff"
+              title="Admin Dashboard"
+              onClick={() => setShowModal(true)}
+            />
 
             <FaUserCircle
               className="profile-icon"
@@ -56,19 +243,21 @@ export default function Home() {
               title="Profile"
               onClick={() => navigate("/profile")}
             />
-            <FaRobot 
+            <FaRobot
               size={22}
               style={{ cursor: "pointer" }}
               title="AI Assistant"
               onClick={() => navigate("/vichat")}
             />
-            <GiClothes 
+            
+            <GiClothes
               size={24}
               style={{ cursor: "pointer" }}
               title="Virtual Wardrobe"
-              onClick={() => navigate("/viton")}
+              onClick={() => { window.location.href = 'http://localhost:8501'; }}
+              className="nav-link"
             />
-            <FaShoppingCart 
+            <FaShoppingCart
               className="cart-icon"
               size={22}
               style={{ cursor: "pointer" }}
@@ -77,9 +266,18 @@ export default function Home() {
             />
           </div>
         </nav>
-
-        
       </section>
+
+      {/* Password Modal */}
+      {showModal && (
+        <DashboardModal
+          onClose={() => setShowModal(false)}
+          onSuccess={() => {
+            setShowModal(false);
+            navigate("/dashboard");
+          }}
+        />
+      )}
 
       {/* VALUES SECTION */}
       <section className="values container py-5">
@@ -157,7 +355,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
         <div className="row g-4">
           <div className="col-md-4">
             <div className="promo-card small" style={{ backgroundImage: `url(${individualityImg})` }}>
@@ -194,13 +391,13 @@ export default function Home() {
               <h5>Elegance</h5>
               <p>Timeless men fashion</p>
             </div>
-          </div>      
+          </div>
           <div className="col-md-3">
             <div className="value-card" style={{ backgroundImage: `url(${confiddenceImg})` }}>
               <h5>Individuality</h5>
               <p>Every style is unique</p>
             </div>
-          </div>                
+          </div>
           <div className="col-md-3">
             <div className="value-card" style={{ backgroundImage: `url(${individdualityImg})` }}>
               <h5>Confidence</h5>
@@ -262,7 +459,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
         <div className="row g-4">
           <div className="col-md-4">
             <div className="promo-card small" style={{ backgroundImage: `url(${aserImg})` }}>
